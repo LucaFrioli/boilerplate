@@ -14,7 +14,7 @@ class FrontendRoutes {
 		const __dirname = path.dirname(__filename);
 
 		this.router.get('*', (req, res) => {
-			res.sendFile(path.join(__dirname, '../../../dist', 'index.html'));
+			res.sendFile(path.join(__dirname, '../../dist', 'index.html'));
 		});
 	}
 

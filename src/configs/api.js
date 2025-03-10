@@ -1,4 +1,5 @@
 import express from 'express';
+import helloWorldRoutes from '../routes/helloWorld.routes.js';
 
 class ApiRoutes {
 	constructor() {
@@ -8,9 +9,7 @@ class ApiRoutes {
 	}
 
 	initializeRoutes() {
-		this.router.get('/helloWorld', (req, res) => {
-			res.send('Hello, World!');
-		});
+		this.router.use('/helloWorld', helloWorldRoutes);
 	}
 
 	getRouter() {
