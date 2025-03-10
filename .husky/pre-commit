@@ -1,1 +1,5 @@
-npm run lint
+echo "iniciando o linting..."
+
+npm run lint || (echo "erro ao executar linting de código" && exit 1)
+
+echo "linting finalizado com sucesso!"
