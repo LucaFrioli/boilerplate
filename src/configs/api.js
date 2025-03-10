@@ -2,6 +2,7 @@ import express from 'express';
 
 class ApiRoutes {
 	constructor() {
+		// eslint-disable-next-line new-cap
 		this.router = express.Router();
 		this.initializeRoutes();
 	}

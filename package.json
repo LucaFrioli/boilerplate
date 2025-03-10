@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "concurrently 'vite' 'nodemon server.js'",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "preview": "vite preview",
-	"start": "node server.js"
+    "start": "node server.js",
+    "prepare": "husky"
   },
   "dependencies": {
     "express": "^4.21.2",
@@ -17,6 +18,10 @@
     "react-router": "^7.2.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.9",
+    "@babel/eslint-parser": "^7.26.8",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
     "@eslint/js": "^9.21.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
@@ -26,9 +31,11 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "husky": "^9.1.7",
     "nodemon": "^3.1.7",
     "prettier": "^3.3.3",
     "sucrase": "^3.35.0",

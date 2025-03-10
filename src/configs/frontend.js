@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 
 class FrontendRoutes {
 	constructor() {
+		// eslint-disable-next-line new-cap
 		this.router = express.Router();
 		this.setupFrontendRoute();
 	}
