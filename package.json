@@ -11,7 +11,7 @@
     "start": "node server.js",
     "prepare": "husky",
 	"create-migration": "",
-	"migrate-db": ""
+	"migrate-db": "npx sequelize db:migrate"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
