@@ -106,7 +106,7 @@ Este arquivo contém as configurações de conexão com o banco de dados Postgre
 ### **Principais Configurações**
 
 | Propriedade       | Valor Configurado                         | Função                                                        |
-| ----------------- | ----------------------------------------- | --------------------------------------------------------------|
+| ----------------- | ----------------------------------------- | ------------------------------------------------------------- |
 | `dialect`         | `'postgres'`                              | Define que o banco de dados utilizado é o PostgreSQL          |
 | `host`            | `process.env.DATABASE_HOST`               | Define o host onde o banco de dados está rodando              |
 | `port`            | `process.env.DATABASE_PORT`               | Define a porta do banco de dados                              |
@@ -137,6 +137,71 @@ Com essa configuração, o Sequelize estará pronto para interagir corretamente 
 Com essa configuração, o Sequelize está pronto para se conectar ao banco de dados e criar tabelas conforme os modelos definidos no projeto!
 
 
+
+# Normalizador de Arquivos
+
+Foi incluido um script de normalização de arquivos para converter automaticamente migrações criadas pelo Sequelize CLI de arquivos `.js` para `.cjs`. Isso garante que as migrações funcionem corretamente dentro da configuração do projeto, especialmente ao utilizar o `type: "module"` no `package.json`.
+
+## Motivação
+O Sequelize CLI gera arquivos de migração no formato `.js`, mas quando o projeto está configurado para usar ES Modules, esses arquivos podem gerar erros, pois exigem CommonJS. Para evitar a necessidade de renomear e modificar os arquivos manualmente, criamos um script que automatiza esse processo.
+
+Para isso foi criado um arquivo na raiz do projeto chamado `normalize_extension.config.js`, que utiliza o módulo `fs/promises` do Node.js para:
+1. Percorrer o diretório de migrações.
+2. Identificar arquivos `.js`.
+3. Adicionar uma regra ESLint ao início do arquivo para evitar problemas de import no CommonJS.
+4. Renomear a extensão do arquivo de `.js` para `.cjs`.
+5. Exibir logs no console informando as alterações realizadas.
+
+## Estrutura do Código
+
+```javascript
+import { readdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
+import path, { basename, extname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Obtém o caminho do arquivo atual e o diretório base
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Definição do caminho do diretório de migrações
+const mainPaths = {
+    migrations: resolve(__dirname, 'src', 'database', 'migrations'),
+};
+
+// Função para modificar a extensão dos arquivos dentro do diretório
+async function changeExtension(dir, oldExt, newExt) {
+    try {
+        const files = await readdir(dir);
+
+        for (const file of files) {
+            const filePath = join(dir, file);
+            const status = await stat(filePath);
+
+            if (status.isFile() && extname(file) === oldExt) {
+                const newFilePath = join(dir, basename(file, oldExt) + newExt);
+
+                if (filePath !== newFilePath) {
+                    const content = await readFile(filePath, 'utf-8');
+                    const newContent = '/* eslint-disable import/no-commonjs */\n' + content;
+
+                    await writeFile(filePath, newContent, 'utf8');
+                    await rename(filePath, newFilePath);
+                    console.info(`Renomeado: ${file} -> ${basename(newFilePath)}`);
+                }
+            }
+        }
+        console.log('Troca de extensão concluída com sucesso!');
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+// Executa a função para normalizar os arquivos de migração
+changeExtension(mainPaths.migrations, ".js", ".cjs");
+```
+
+Para o script se integrar com a ferramenta de criação de migrações foi definido uma série de scripts que serão utilizados para fazer o manejamento de forma simplificada da parte mais significativa refeerente ao Sequelize.
+
 # Utilizando o ORM:
 
 Após compreendermos como foi realizada a configuração do ORM devemos compreender como utilizar os scripts agregados a suas funcionalidades.
@@ -145,6 +210,7 @@ Para começar a criar uma migração foi declarado o script
 
 - **`create-migration`**;
 - **`migrate-db`**;
+- **`normalize-ext`**; (_script auxiliar_)
 
 Dentro do arquivo `package.json`, na seção scripts serão encontrados estes dois scripts entre os principais abordados no `readme` principal
 

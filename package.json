@@ -10,8 +10,9 @@
     "preview": "vite preview",
     "start": "node server.js",
     "prepare": "husky",
-	"create-migration": "",
-	"migrate-db": "npx sequelize db:migrate"
+	"create-migration": "npx sequelize-cli migration:create --name $npm_config_name && npm run normalize-ext",
+	"migrate-db": "npx sequelize db:migrate",
+	"normalize-ext": "node ./normalize_extensions.config.js && npm run lint"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
