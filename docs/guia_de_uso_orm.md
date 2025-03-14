@@ -1,5 +1,14 @@
 # Este é um guia de uso do Orm sequlize e sua integração com a arquitetura:
 
+## Sumário
+
+- [Configuração necessária .env](#env)
+- [Explicação da configuração realizada do sequelize](#sequelizerc)
+- [Explicação da configuração realizada de interação com banco de dados](#databasecjs)
+- [Utilizando npm para gerenciar banco de dados](#utilizando-o-orm)
+	- [Criando Migrações](#utilizando-o-comando-npm-run-create-migration)
+	- [Realizando Migrações](#utilizando-o-comando-npm-run-migrate-db)
+
 # **`.env`**
 
 Primeiramente deve-se criar um arquivo .env na raíz do projeto contendo as seguintes configurações até o momento:
@@ -202,7 +211,7 @@ async function changeExtension(dir, oldExt, newExt) {
 changeExtension(mainPaths.migrations, '.js', '.cjs');
 ```
 
-Para o script se integrar com a ferramenta de criação de migrações foi definido uma série de scripts que serão utilizados para fazer o manejamento de forma simplificada da parte mais significativa refeerente ao Sequelize.
+Para o script se integrar com a ferramenta de criação de migrações foi definido uma série de scripts que serão utilizados para fazer o manejamento de forma simplificada da parte mais significativa referente ao Sequelize.
 
 # Utilizando o ORM:
 
@@ -250,6 +259,8 @@ npm run migrate-db
 ### Explicação:
 - Utiliza o `sequelize-cli` para executar todas as migrações dentro da pasta `migrations`.
 - Garante que o esquema do banco de dados esteja atualizado de acordo com as últimas definições de modelo.
+
+---
 
 ## Utilizando o comando `npm run normalize-ext`:
 
