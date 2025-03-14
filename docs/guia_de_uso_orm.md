@@ -52,17 +52,16 @@ Este arquivo permite que o **Sequelize CLI** saiba onde estão localizados os ar
 
 O objeto exportado define os caminhos essenciais para a organização do Sequelize no projeto:
 
-| Propriedade       | Caminho Definido            | Função                                              |
-| ----------------- | --------------------------- | --------------------------------------------------- |
-| `config`          | `src/configs/database.cjs`  | Arquivo de configuração do banco de dados           |
-| `models-path`     | `src/models`                | Diretório onde ficam os modelos ORM do Sequelize    |
-| `migrations-path` | `src/database/migrations`   | Diretório onde ficam as migrações do banco de dados |
-| `seeders-path`    | `src/database/seeds`        | Diretório onde ficam os seeders (dados iniciais)    |
+| Propriedade       | Caminho Definido           | Função                                              |
+| ----------------- | -------------------------- | --------------------------------------------------- |
+| `config`          | `src/configs/database.cjs` | Arquivo de configuração do banco de dados           |
+| `models-path`     | `src/models`               | Diretório onde ficam os modelos ORM do Sequelize    |
+| `migrations-path` | `src/database/migrations`  | Diretório onde ficam as migrações do banco de dados |
+| `seeders-path`    | `src/database/seeds`       | Diretório onde ficam os seeders (dados iniciais)    |
 
 ---
 
 Agora, com essa configuração definida, o **Sequelize CLI** poderá acessar corretamente os arquivos necessários para o gerenciamento do banco de dados!
-
 
 # **`database.cjs`**
 
@@ -105,22 +104,22 @@ Este arquivo contém as configurações de conexão com o banco de dados Postgre
 
 ### **Principais Configurações**
 
-| Propriedade       | Valor Configurado                         | Função                                                        |
-| ----------------- | ----------------------------------------- | ------------------------------------------------------------- |
-| `dialect`         | `'postgres'`                              | Define que o banco de dados utilizado é o PostgreSQL          |
-| `host`            | `process.env.DATABASE_HOST`               | Define o host onde o banco de dados está rodando              |
-| `port`            | `process.env.DATABASE_PORT`               | Define a porta do banco de dados                              |
-| `username`        | `process.env.DATABASE_USERNAME`           | Usuário do banco de dados                                     |
-| `password`        | `process.env.DATABASE_PASSWORD`           | Senha do banco de dados                                       |
-| `database`        | `process.env.DATABASE`                    | Nome da base de dados                                         |
-| `timestamps`      | `true`                                    | Ativa automaticamente os campos `createdAt` e `updatedAt`     |
-| `underscored`     | `true`                                    | Define nomes de colunas usando snake_case                     |
-| `underscoredAll`  | `true`                                    | Aplica o formato snake_case a todas as colunas                |
-| `createdAt`       | `'created_at'`                            | Renomeia o campo de criação para `created_at`                 |
-| `updatedAt`       | `'updated_at'`                            | Renomeia o campo de atualização para `updated_at`             |
-| `deletedAt`       | `'deleted_at'`                            | Ativa a funcionalidade de exclusão lógica (`soft delete`)     |
-| `timezone`        | `'America/Sao_Paulo'`                     | Define o fuso horário do banco de dados                       |
-| `dialectOptions`  | `{ timezone: 'America/Sao_Paulo' }`       | Garante que as operações do banco respeitem esse fuso horário |
+| Propriedade      | Valor Configurado                   | Função                                                        |
+| ---------------- | ----------------------------------- | ------------------------------------------------------------- |
+| `dialect`        | `'postgres'`                        | Define que o banco de dados utilizado é o PostgreSQL          |
+| `host`           | `process.env.DATABASE_HOST`         | Define o host onde o banco de dados está rodando              |
+| `port`           | `process.env.DATABASE_PORT`         | Define a porta do banco de dados                              |
+| `username`       | `process.env.DATABASE_USERNAME`     | Usuário do banco de dados                                     |
+| `password`       | `process.env.DATABASE_PASSWORD`     | Senha do banco de dados                                       |
+| `database`       | `process.env.DATABASE`              | Nome da base de dados                                         |
+| `timestamps`     | `true`                              | Ativa automaticamente os campos `createdAt` e `updatedAt`     |
+| `underscored`    | `true`                              | Define nomes de colunas usando snake_case                     |
+| `underscoredAll` | `true`                              | Aplica o formato snake_case a todas as colunas                |
+| `createdAt`      | `'created_at'`                      | Renomeia o campo de criação para `created_at`                 |
+| `updatedAt`      | `'updated_at'`                      | Renomeia o campo de atualização para `updated_at`             |
+| `deletedAt`      | `'deleted_at'`                      | Ativa a funcionalidade de exclusão lógica (`soft delete`)     |
+| `timezone`       | `'America/Sao_Paulo'`               | Define o fuso horário do banco de dados                       |
+| `dialectOptions` | `{ timezone: 'America/Sao_Paulo' }` | Garante que as operações do banco respeitem esse fuso horário |
 
 Com essa configuração, o Sequelize estará pronto para interagir corretamente com o banco de dados PostgreSQL de maneira eficiente e segura.
 
@@ -136,16 +135,16 @@ Com essa configuração, o Sequelize estará pronto para interagir corretamente 
 
 Com essa configuração, o Sequelize está pronto para se conectar ao banco de dados e criar tabelas conforme os modelos definidos no projeto!
 
-
-
 # Normalizador de Arquivos
 
 Foi incluido um script de normalização de arquivos para converter automaticamente migrações criadas pelo Sequelize CLI de arquivos `.js` para `.cjs`. Isso garante que as migrações funcionem corretamente dentro da configuração do projeto, especialmente ao utilizar o `type: "module"` no `package.json`.
 
 ## Motivação
+
 O Sequelize CLI gera arquivos de migração no formato `.js`, mas quando o projeto está configurado para usar ES Modules, esses arquivos podem gerar erros, pois exigem CommonJS. Para evitar a necessidade de renomear e modificar os arquivos manualmente, criamos um script que automatiza esse processo.
 
 Para isso foi criado um arquivo na raiz do projeto chamado `normalize_extension.config.js`, que utiliza o módulo `fs/promises` do Node.js para:
+
 1. Percorrer o diretório de migrações.
 2. Identificar arquivos `.js`.
 3. Adicionar uma regra ESLint ao início do arquivo para evitar problemas de import no CommonJS.
@@ -165,58 +164,103 @@ const __dirname = path.dirname(__filename);
 
 // Definição do caminho do diretório de migrações
 const mainPaths = {
-    migrations: resolve(__dirname, 'src', 'database', 'migrations'),
+	migrations: resolve(__dirname, 'src', 'database', 'migrations'),
 };
 
 // Função para modificar a extensão dos arquivos dentro do diretório
 async function changeExtension(dir, oldExt, newExt) {
-    try {
-        const files = await readdir(dir);
+	try {
+		const files = await readdir(dir);
 
-        for (const file of files) {
-            const filePath = join(dir, file);
-            const status = await stat(filePath);
+		for (const file of files) {
+			const filePath = join(dir, file);
+			const status = await stat(filePath);
 
-            if (status.isFile() && extname(file) === oldExt) {
-                const newFilePath = join(dir, basename(file, oldExt) + newExt);
+			if (status.isFile() && extname(file) === oldExt) {
+				const newFilePath = join(dir, basename(file, oldExt) + newExt);
 
-                if (filePath !== newFilePath) {
-                    const content = await readFile(filePath, 'utf-8');
-                    const newContent = '/* eslint-disable import/no-commonjs */\n' + content;
+				if (filePath !== newFilePath) {
+					const content = await readFile(filePath, 'utf-8');
+					const newContent =
+						'/* eslint-disable import/no-commonjs */\n' + content;
 
-                    await writeFile(filePath, newContent, 'utf8');
-                    await rename(filePath, newFilePath);
-                    console.info(`Renomeado: ${file} -> ${basename(newFilePath)}`);
-                }
-            }
-        }
-        console.log('Troca de extensão concluída com sucesso!');
-    } catch (e) {
-        console.error(e);
-    }
+					await writeFile(filePath, newContent, 'utf8');
+					await rename(filePath, newFilePath);
+					console.info(
+						`Renomeado: ${file} -> ${basename(newFilePath)}`,
+					);
+				}
+			}
+		}
+		console.log('Troca de extensão concluída com sucesso!');
+	} catch (e) {
+		console.error(e);
+	}
 }
 
 // Executa a função para normalizar os arquivos de migração
-changeExtension(mainPaths.migrations, ".js", ".cjs");
+changeExtension(mainPaths.migrations, '.js', '.cjs');
 ```
 
 Para o script se integrar com a ferramenta de criação de migrações foi definido uma série de scripts que serão utilizados para fazer o manejamento de forma simplificada da parte mais significativa refeerente ao Sequelize.
 
 # Utilizando o ORM:
 
-Após compreendermos como foi realizada a configuração do ORM devemos compreender como utilizar os scripts agregados a suas funcionalidades.
+Após compreendermos como foi realizada a configuração do ORM, devemos entender como utilizar os scripts agregados às suas funcionalidades.
 
-Para começar a criar uma migração foi declarado o script
+Para começar a criar uma migração, foram declarados os seguintes scripts:
 
 - **`create-migration`**;
 - **`migrate-db`**;
 - **`normalize-ext`**; (_script auxiliar_)
 
-Dentro do arquivo `package.json`, na seção scripts serão encontrados estes dois scripts entre os principais abordados no `readme` principal
+Dentro do arquivo `package.json`, na seção `scripts`, esses scripts estão entre os principais abordados no `README` principal:
 
 ```json
-	"create-migration": "",
-	"migrate-db": ""
+"scripts": {
+  "create-migration": "npx sequelize-cli migration:create --name $npm_config_name && npm run normalize-ext",
+  "migrate-db": "npx sequelize db:migrate",
+  "normalize-ext": "node ./normalize_extensions.config.js && npm run lint"
+}
 ```
 
-## Utilizando o comando `npm create-migration`:
+## Utilizando o comando `npm run create-migration`:
+
+O comando `npm run create-migration` é utilizado para gerar um novo arquivo de migração dentro do diretório `migrations` do seu projeto. Esse script utiliza o `sequelize-cli` para criar um arquivo de migração com um nome específico fornecido pelo usuário.
+
+### Sintaxe:
+```sh
+npm run create-migration --name=nome_da_migracao
+```
+
+### Explicação:
+- O argumento `--name=nome_da_migracao` define o nome do arquivo de migração.
+- O comando `npx sequelize-cli migration:create` gera um arquivo de migração.
+- O script `normalize-ext` é executado automaticamente para padronizar extensões e formatar o código.
+
+## Utilizando o comando `npm run migrate-db`:
+
+O comando `npm run migrate-db` aplica todas as migrações pendentes no banco de dados configurado.
+
+### Sintaxe:
+```sh
+npm run migrate-db
+```
+
+### Explicação:
+- Utiliza o `sequelize-cli` para executar todas as migrações dentro da pasta `migrations`.
+- Garante que o esquema do banco de dados esteja atualizado de acordo com as últimas definições de modelo.
+
+## Utilizando o comando `npm run normalize-ext`:
+
+O script `normalize-ext` é um auxiliar que ajusta extensões de arquivos e realiza a formatação do código para manter um padrão dentro do projeto.
+
+### Sintaxe:
+```sh
+npm run normalize-ext
+```
+
+### Explicação:
+- Executa o arquivo `normalize_extensions.config.js`, que pode conter regras específicas para renomear arquivos ou ajustar suas extensões.
+- Após a normalização, executa o `npm run lint` para garantir que o código esteja formatado corretamente.
+
