@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
+
+import './src/database/index.js'; // retire esta linha caso não for trabalhar com banco de dados
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import apiRoutes from './src/configs/api.js';
-import frontendRoutes from './src/configs/frontend.js';
+import apiRoutes from './src/configs/api.js'; // retire esta linha caso for utilizar o backend apenas para SSR
+import frontendRoutes from './src/configs/frontend.js'; // retire esta linha caso for trabalhar apenas com APIs sem renderização frontend no back
 
 class App {
 	constructor() {
@@ -26,8 +28,9 @@ class App {
 	}
 
 	routes() {
-		this.app.use('/api', apiRoutes);
-		this.app.use('*', frontendRoutes);
+		// mantenha as duas linhas caso for trbalhar com fullstack acoplado
+		this.app.use('/api', apiRoutes); // retire esta linha caso for trbalhar apenas com ssr
+		this.app.use('*', frontendRoutes); // retire esta linha caso for trabalhar apenas com API
 	}
 }
 

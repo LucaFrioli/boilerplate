@@ -10,8 +10,9 @@
 - [Utilizando npm para gerenciar banco de dados](#utilizando-o-orm)
     - [Criando Migrações](#utilizando-o-comando-npm-run-create-migration)
     - [Realizando Migrações](#utilizando-o-comando-npm-run-migrate-db)
-- [Explicando como criar a morfologia de uma migração, e como criar seu modelo](#configurando-uma-migração-e-criando-seu-modelo)
+- [Explicando como criar a morfologia de uma migração, e como criar seu modelo e utiliza-lo no backend](#configurando-uma-migração-e-criando-seu-modelo)
     - [Explicação de como criar um model](#criando-um-model)
+	- [Utilizando o modelo]()
 
 # **`.env`**
 
@@ -425,7 +426,7 @@ module.exports = {
 		 */
 		await queryInterface.createTable('nome_da_tabela', {
 			// campos da tabela aqui
-			id: {
+			id: { // utilizar id sempre como uuid ou integer se não houver uma modelagem mais complexa
 				type: Sequelize.UUID, // tipo de dado
 				allowNull: false, // permissão de valor nulo, true permite valor nulo
 				primaryKey: true, // definição de chave-primária (POR PADRÃO NÃO HÁ A NECESSIDADE DE DECLARA somente dclare caso for chave-primária)
@@ -562,6 +563,12 @@ class User extends Model {
 	static init(sequelize) {
 		super.init(
 			{
+				id: { // quando o id for um UUID recomendo reddeclarar ele em sua completude no modelo
+					type: Sequelize.UUID,
+					allowNull: false,
+					primaryKey: true,
+					defaultValue: Sequelize.UUIDV4(),// caso esteja trbalhando com UUID lembre de iniciar a função UUIDV4
+				},
 				first_name: Sequelize.STRING,
 				last_name: Sequelize.STRING,
 				phone_number: Sequelize.STRING,
