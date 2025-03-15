@@ -2,6 +2,7 @@
 /* eslint-disable import/no-commonjs */
 'use strict';
 
+// criação exacerbada de demonstração, em como fazer declarações. Na próxima migração ireia abordar como manipular a tabela retirando alguns campos
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
 	async up(queryInterface, Sequelize) {
