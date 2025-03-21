@@ -1,4 +1,4 @@
-import { deepEqual } from './deepEquality.validation';
+import { deepEqual } from './deepEquality.validation.js';
 
 /**
  * Valida se a entrada do dado é um json válido
@@ -68,19 +68,23 @@ function validateNameOfKeys(data, arrayOfExpectedNames) {
 
 /**
  * Função para definir profundidade de JSON
- * @param {json} data
- * @param {function null} [action=null]
- * @throws { Error } lança erro ao detectar objeto circular
- * @returns {number} Número que representa a maior profundidade que o objeto chegou
+ * @param {json} data - O objeto JSON a ser mapeado.
+ * @param {Function} [action=null] - Função opcional para realizar ações em cada nível.
+ * @param {number} [depth=1] - Nível atual de profundidade na recursão (inicia em 1).
+ * @param {WeakSet<object>} [visited=new WeakSet()] - Conjunto para rastrear objetos visitados e detectar loops.
+ * @throws { Error } - Lança erro ao detectar objeto circular
+ * @returns {number} - Número que representa a maior profundidade que o objeto chegou
  */
-function defineDepthness(data, action = null, depth = 1, visited = new Set()) {
-	isJson(data);
-
+function defineDepthness(
+	data,
+	action = null,
+	depth = 1,
+	visited = new WeakSet(),
+) {
 	if (visited.has(data)) {
 		throw new Error(
-			'Looping detectado, ' +
-				data +
-				' averigue se utilizar JSON neste caso é a melhor escolha',
+			`Looping detectado, averigue se utilizar JSON neste caso é a melhor escolha. Estrutura set ${JSON.stringify([...visited])}...
+			Dado: ${JSON.stringify([...data])}`,
 		);
 	}
 
@@ -92,6 +96,9 @@ function defineDepthness(data, action = null, depth = 1, visited = new Set()) {
 
 	let maxDepth = depth;
 	for (const key in data) {
+		if (data[key] === null || typeof data[key] !== 'object') {
+			continue;
+		}
 		if (Object.prototype.hasOwnProperty.call(data, key)) {
 			maxDepth = Math.max(
 				maxDepth,
@@ -111,7 +118,7 @@ function defineDepthness(data, action = null, depth = 1, visited = new Set()) {
  * @param {Object} [map={}] - Mapa acumulador para armazenar a estrutura hierárquica.
  * @param {Object} [parentMap={}] - Mapa acumulador para relacionamentos pai-filho.
  * @param {string|null} [parentKey=null] - Chave do objeto pai no nível anterior.
- * @param {Set<Object>} [visited=new Set()] - Conjunto para rastrear objetos visitados e detectar loops.
+ * @param {Set<Object>} [visited=new WeakSet()] - Conjunto para rastrear objetos visitados e detectar loops.
  * @returns {{
  *   map: Object,
  *   parentMap: Object
@@ -133,13 +140,13 @@ function definingMap(
 	map = {},
 	parentMap = {},
 	parentKey = null,
-	visited = new Set(),
+	visited = new WeakSet(),
 ) {
-	isJson(data);
-
 	if (visited.has(data)) {
 		throw new Error(
-			'Loop detectado! Certifique-se de que o JSON não é circular.',
+			`Loop detectado! Certifique-se de que o JSON não é circular.
+			Data: ${JSON.stringify([...visited])}
+			Visitados: ${JSON.stringify([...visited])}`,
 		);
 	}
 
@@ -242,8 +249,9 @@ function validateObject(obj, schema, path = 'root') {
 			}
 		} else if (expectedType instanceof RegExp) {
 			if (
-				typeof actualValue !== 'string' ||
-				(actualValue !== null && !expectedType.test(actualValue))
+				actualValue !== null &&
+				(typeof actualValue !== 'string' ||
+					!expectedType.test(actualValue))
 			) {
 				errors.push(
 					`Erro em ${currentPath}: valor inválido (${actualValue})`,
@@ -281,7 +289,7 @@ function validateJson(value, schema) {
 	const depthnessOfSchema = defineDepthness(schema);
 	const depthnessOfValue = defineDepthness(value);
 
-	if (!depthnessOfSchema === depthnessOfValue) {
+	if (depthnessOfSchema !== depthnessOfValue) {
 		throw new Error(
 			`O valor enviado tem uma profundidade de ${depthnessOfValue}, porém a esperada era ${depthnessOfSchema} !`,
 		);
@@ -293,7 +301,7 @@ function validateJson(value, schema) {
 	if (!deepEqual(schemaMap, valueMap)) {
 		throw new Error(
 			`O mapa do valor é difernete do esperado!
-				Mapa recebido ${valueMap}
+				Mapa recebido ${JSON.stringify(valueMap)}
 			`,
 		);
 	}
