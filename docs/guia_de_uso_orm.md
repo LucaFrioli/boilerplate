@@ -12,7 +12,7 @@
     - [Realizando Migrações](#utilizando-o-comando-npm-run-migrate-db)
 - [Explicando como criar a morfologia de uma migração, e como criar seu modelo e utiliza-lo no backend](#configurando-uma-migração-e-criando-seu-modelo)
     - [Explicação de como criar um model](#criando-um-model)
-	- [Utilizando o modelo]()
+    - [Utilizando o modelo]()
 
 # **`.env`**
 
@@ -426,7 +426,8 @@ module.exports = {
 		 */
 		await queryInterface.createTable('nome_da_tabela', {
 			// campos da tabela aqui
-			id: { // utilizar id sempre como uuid ou integer se não houver uma modelagem mais complexa
+			id: {
+				// utilizar id sempre como uuid ou integer se não houver uma modelagem mais complexa
 				type: Sequelize.UUID, // tipo de dado
 				allowNull: false, // permissão de valor nulo, true permite valor nulo
 				primaryKey: true, // definição de chave-primária (POR PADRÃO NÃO HÁ A NECESSIDADE DE DECLARA somente dclare caso for chave-primária)
@@ -586,6 +587,10 @@ class User extends Model {
 
 export default User;
 ```
+
+#### **Importante !!!**
+
+É de extrema importância também aplicar validações no model, para verificar como faze-lo [clique aqui!](./orm/validationGuide.md)
 
 ### Resumo
 
