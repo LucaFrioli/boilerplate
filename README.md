@@ -43,9 +43,9 @@ Este conjunto de documentações foi elaborado para:
 ### **Contribuições e Suporte**
 
 🌟 **Faça parte do desenvolvimento!**
-- Encontrou um bug? [Abra uma Issue](link-issues) com detalhes da reprodução
-- Tem uma ideia de melhoria? Compartilhe na seção de [Discussões](link-discussões)
-- Quer codificar? Confira as [Tasks Abertas](link-tasks) e envie um PR
+- Encontrou um bug? Abra uma Issue com detalhes da reprodução
+- Tem uma ideia de melhoria? Compartilhe na seção de Discussões
+- Quer codificar? Confira as Tasks Abertas e envie um PR
 
 🛠 **Formas de Contribuir:**
 1. Revisão técnica de PRs
