@@ -1,5 +1,6 @@
 /* eslint-disable new-cap */
 import Sequelize, { Model } from 'sequelize';
+import UserValidation from './validations/User/User.validations';
 
 export default class User extends Model {
 	static init(sequelize) {
@@ -12,18 +13,86 @@ export default class User extends Model {
 					primaryKey: true,
 					defaultValue: Sequelize.UUIDV4(), // Garante que o UUID seja gerado automaticamente
 				},
+
 				// configuração dos campos requeridos
-				first_name: Sequelize.STRING(50), // Tipo de dado string com limite de 50 caracteres
-				last_name: Sequelize.STRING(50),
-				phone_number: Sequelize.STRING(20), // Tipo de dado string para telefone
-				email: Sequelize.STRING,
-				age: Sequelize.INTEGER, // Tipo inteiro
-				birth_date: Sequelize.DATEONLY, // Tipo de dado apenas de data (sem hora)
-				salary: Sequelize.DECIMAL(10, 2), // Tipo decimal, com 10 dígitos no total e 2 após a vírgula
-				is_active: Sequelize.BOOLEAN, // Tipo de dado booleano
-				json_data: Sequelize.JSON, // Tipo de dado JSON
-				ip_address: Sequelize.INET, // Tipo de dado para armazenar um endereço IP
-				additional_info: Sequelize.JSONB, // JSONB para armazenar dados JSON com busca eficiente
+				first_name: {
+					type: Sequelize.STRING(50),
+					validate: {
+						isAlphanumeric: {
+							msg: 'O Nome deve conter apenas caracteres Alphanuméricos',
+						},
+					}, // valida se é um registro alfanumérico,
+				},
+
+				last_name: {
+					type: Sequelize.STRING(50),
+					validate: {
+						isAlphanumeric: {
+							msg: 'O Sobrenome deve conter apenas caracteres Alphanuméricos',
+						},
+					},
+				},
+
+				phone_number: {
+					type: Sequelize.STRING(20),
+					validate: {
+						len: {
+							args: [[7, 20]],
+							msg: 'Números de telefone tem entre 7 a 20 caracteres',
+						},
+
+						is: {
+							// eslint-disable-next-line no-useless-escape
+							args: /^(?:\+?\d{1,3}[\s\.\-\(\)]?)?(\(?\d{2,4}\)?[\s\.\-\(\)]?)?(\d{4,5})[\s\.\-\(\)]?\d{4}$/,
+							msg: 'O telefone deve ser um núero válido',
+						},
+					},
+				},
+
+				email: {
+					type: Sequelize.STRING,
+					unique: {
+						msg: 'Este email já foi cadastrado',
+					},
+					validate: { isEmail: { msg: 'O Email é inválido' } },
+				},
+
+				birth_date: {
+					type: Sequelize.DATEONLY,
+					validate: { isDate: true },
+				}, // Tipo de dado apenas de data (sem hora)
+
+				is_active: {
+					type: Sequelize.BOOLEAN,
+					validate: { isIn: [[true, false]] },
+				},
+
+				ip_address: { type: Sequelize.INET, validate: { isIP: true } }, // Tipo de dado para armazenar um endereço IP
+
+				additional_info: {
+					type: Sequelize.JSONB,
+					validate: {
+						validateJsonInput(value) {
+							const isValid = new UserValidation(value);
+							isValid.additionalInfoValidateInput();
+						},
+					},
+				},
+
+				// irei abordar como lidar com senhas após o commit de organização de modelo
+				password_hash: { type: Sequelize.STRING, defaultValue: '' },
+				password: {
+					type: Sequelize.VIRTUAL,
+					validate: {
+						len: {
+							args: [6, 50],
+							msg: 'A senha deve ter de 6 a 50 caracteres',
+						},
+						isAlphanumeric: {
+							msg: 'A senha deve conter números e letras',
+						},
+					},
+				}, // campo que existe mas apenas em memória
 			},
 			{
 				sequelize,
