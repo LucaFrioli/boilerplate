@@ -1,6 +1,6 @@
 /* eslint-disable new-cap */
 import Sequelize, { Model } from 'sequelize';
-import UserValidation from './validations/User/User.validations';
+import UserValidation from './validations/User/User.validations.js';
 
 export default class User extends Model {
 	static init(sequelize) {
