@@ -9,6 +9,7 @@ Abaixo, estão as principais validações disponíveis, com exemplos práticos d
 ## Validação de Campos Obrigatórios
 
 ### **`allowNull: false`**
+
 Impede que o campo seja nulo.
 
 ```javascript
@@ -223,10 +224,10 @@ password: {
 ## Exemplo de Validações
 
 ```javascript
-const { DataTypes } = require("sequelize");
-const sequelize = require("../database");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database');
 
-const User = sequelize.define("User", {
+const User = sequelize.define('User', {
 	id: {
 		type: DataTypes.UUID,
 		defaultValue: DataTypes.UUIDV4,
@@ -237,8 +238,11 @@ const User = sequelize.define("User", {
 		type: DataTypes.STRING,
 		allowNull: false,
 		validate: {
-			notNull: { msg: "O nome é obrigatório." },
-			len: { args: [3, 50], msg: "O nome deve ter entre 3 e 50 caracteres." },
+			notNull: { msg: 'O nome é obrigatório.' },
+			len: {
+				args: [3, 50],
+				msg: 'O nome deve ter entre 3 e 50 caracteres.',
+			},
 		},
 	},
 
@@ -247,23 +251,23 @@ const User = sequelize.define("User", {
 		allowNull: false,
 		unique: true,
 		validate: {
-			isEmail: { msg: "O e-mail deve ser válido." },
+			isEmail: { msg: 'O e-mail deve ser válido.' },
 		},
 	},
 
 	age: {
 		type: DataTypes.INTEGER,
 		validate: {
-			isInt: { msg: "A idade deve ser um número inteiro." },
-			min: { args: 18, msg: "A idade mínima é 18 anos." },
+			isInt: { msg: 'A idade deve ser um número inteiro.' },
+			min: { args: 18, msg: 'A idade mínima é 18 anos.' },
 		},
 	},
 
 	role: {
-		type: DataTypes.ENUM("admin", "user", "moderator"),
+		type: DataTypes.ENUM('admin', 'user', 'moderator'),
 		validate: {
 			isIn: {
-				args: [["admin", "user", "moderator"]],
+				args: [['admin', 'user', 'moderator']],
 				msg: "O cargo deve ser 'admin', 'user' ou 'moderator'.",
 			},
 		},
@@ -273,10 +277,13 @@ const User = sequelize.define("User", {
 		type: DataTypes.STRING,
 		allowNull: false,
 		validate: {
-			len: { args: [8, 100], msg: "A senha deve ter pelo menos 8 caracteres." },
+			len: {
+				args: [8, 100],
+				msg: 'A senha deve ter pelo menos 8 caracteres.',
+			},
 			is: {
 				args: [/^(?=.*[A-Z])(?=.*\d).{8,}$/],
-				msg: "A senha deve conter pelo menos uma letra maiúscula e um número.",
+				msg: 'A senha deve conter pelo menos uma letra maiúscula e um número.',
 			},
 		},
 	},
@@ -322,83 +329,130 @@ Tipos de validações existentes
 - **notNull**: `true || false` (impede que o valor seja `null`)
 - **isJSON**: `true || false` (verifica se a string pode ser convertida para um JSON válido, muito simples)
 
-
-
-
 O Sequelize oferece diversas validações para garantir a **consistência** e **segurança** dos dados. No entanto, os tipos `JSON` e `JSONB` não possuem validação nativa para seu conteúdo. Para suprir essa necessidade, foi criada uma interface de validação baseada em schemas, que assegura tanto a estrutura do JSON quanto a validação dos valores de suas chaves.
 
 Para entender como os arquivos relacionados a esta validação funciona mais a fundo [clique aqui!](./json_validation_module.md)
 
 ## Validações do conteúdo JSON
 
+Para iniciar a validação de json utilizando o módulo disponibilizado, primeiramente devemos importá-lo no header de nosso arquivo e puxar a função `validateJson` . Além disso iremos ccriar uma função similar com as do exemplo de `Validações Personalizadas`. após a criação da função personalizada, iniciando-a com o parâmetro `value` e feita a importação da função `validateJson`, vamos para o próximo passo.
+
+Ao realizar validações com base em schemas JSON, é essencial definir primeiramente a estrutura esperada do objeto recebido dentro de nossa validação personalizada. Essa estrutura deve conter todas as chaves e subchaves que serão verificadas, juntamente com suas respectivas regras de validação.
+
+Cada chave do schema pode ser associada a diferentes tipos de validação, incluindo:
+
+- **Tipos primitivos** como `String`, `Number` ou `Boolean`.
+- **Expressões regulares**, que devem ser declaradas dentro de uma _arrow function_ e retornar um valor booleano. O parâmetro `value` dentro dessas funções corresponde ao valor recebido no JSON que está sendo validado.
+- **Comparações diretas**, permitindo verificar se um valor atende a determinados critérios, como pertencer a um conjunto de valores pré-definidos.
+- **Retorno condicional com `||`**, permitindo que uma chave aceite múltiplos tipos de valores (exemplo: aceitar `null` ou um padrão específico).
+- **Funções ou métodos personalizados**, que podem encapsular validações mais complexas e devem sempre retornar um booleano indicando se o valor é válido. **(Recomendado)**
+
+A flexibilidade desse sistema permite validar desde campos simples, como nomes e e-mails, até estruturas mais complexas, como permissões de usuário, configurações de preferências e registros de atividades.
+
+Abaixo, um exemplo ilustrativo de um schema de validação:
+
 ```javascript
-// exemplo exagerado de json só para dar um panorâma de uso de schemas json
+//header do arquivo
+import { validateJson } from './validations/json.validation.js'; // ou o caminho novo se você o alterou de local
+
+//conteúdo da classe
+
+additional_info: {
+	type: Sequelize.JSONB, // pode ser um Sequelize.JSON também
+	validate: {
+	    validateJsonInput(value) {
+			// Exemplo exagerado de json só para dar um panorâma de uso de schemas json
+			// Ao utilizar sequelize não recomendo de forma alguma criar um json com este tamanho para inserir em estruturas de dados json ou jsonb
+			// Este esquema só é um exemplo para haver reforço de conceito e não é recomedado utiliza-lo em sua completude
+			// Expressões regulares em sua maioria são funcionais porém para ambiente de produção devem ser revisadas, aprimoradas ou trocadas.
+		    const schema = {
+				description: String,
+				metadata: {
+					user_id: (value) => typeof value === 'string' && value.length > 0,
+					role: (value) => /^(admin|user|employee|moderator|guest)$/.test(value),
+					account_status: (value) => /^(active|inactive|suspended|banned)$/.test(value),
+
+					profile: {
+						name: (value) => typeof value === 'string' && value.trim().length > 1,
+						age: (value) => Number.isInteger(value) && value >= 13,
+						email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+						phone: (value) => value === null || /^\+\d{1,3}\s?\d{4,14}$/.test(value),
+						address: {
+							street: (value) => typeof value === 'string' && value.trim().length > 2,
+							city: (value) => typeof value === 'string' && value.trim().length > 2,
+							postal_code: (value) => /^\d{5}-\d{3}$/.test(value),
+							country: (value) => typeof value === 'string' && value.length === 2,
+						},
+					},
+
+					configs: {
+						darkTheme: (value) => value === null || typeof value === 'boolean',
+						colorPreferences: {
+							header_and_footer: (value) =>
+								value === null ||
+								/^rgba\(\d{1,3}, \d{1,3}, \d{1,3}, (0|1|0?\.\d+)\)$/.test(value),
+							border_profile_photo: (value) =>
+								value === null ||
+								/^rgba\(\d{1,3}, \d{1,3}, \d{1,3}, (0|1|0?\.\d+)\)$/.test(value),
+						},
+						notifications: {
+							email: (value) => typeof value === 'boolean',
+							sms: (value) => typeof value === 'boolean',
+							push: (value) => typeof value === 'boolean',
+						},
+					},
+
+					social_links: {
+						github: (value) => value === null || /^https:\/\/github\.com\/.+$/.test(value),
+						linkedin: (value) =>
+							value === null || /^https:\/\/www\.linkedin\.com\/in\/.+$/.test(value),
+						twitter: (value) => value === null || /^https:\/\/twitter\.com\/.+$/.test(value),
+						meta_interprise: {
+							instagram: (value) =>
+								value === null || /^https:\/\/www\.instagram\.com\/.+$/.test(value),
+							facebook: (value) =>
+								value === null || /^https:\/\/www\.facebook\.com\/.+$/.test(value),
+						},
+					},
+
+					permissions: {
+						can_edit: (value) => typeof value === 'boolean',
+						can_delete: (value) => typeof value === 'boolean',
+						can_create_users: (value) => typeof value === 'boolean',
+						can_manage_roles: (value) => typeof value === 'boolean',
+					},
+
+					logs: {
+						last_login: (value) => typeof value === 'string' && !isNaN(Date.parse(value)),
+						last_action: (value) =>
+							value === null ||
+							["login", "logout", "update_profile", "delete_account"].includes(value),
+						ip_address: (value) =>
+							/^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/.test(value),
+					},
+				},
+			};
+
+		},
+	}
+}
+```
+
+Após a criação de nossa esquemática, e as validações de cada chave específica, basta terminarmos a nossa função rodando a função que importamos no início, desta maneira:
+
+```javascript
+validateJsonInput(value) {
+
+// Exemplo exagerado de json só para dar um panorâma de uso de schemas json
+// Ao utilizar sequelize não recomendo de forma alguma criar um json com este tamanho para inserir em estruturas de dados json ou jsonb
+// Este esquema só é um exemplo para haver reforço de conceito e não é recomedado utiliza-lo em sua completude
+// Expressões regulares em sua maioria são funcionais porém para ambiente de produção devem ser revisadas, aprimoradas ou trocadas.
 const schema = {
-	description: String,
-	metadata: {
-		user_id: (value) => typeof value === 'string' && value.length > 0,
-		role: (value) => /^(admin|user|employee|moderator|guest)$/.test(value),
-		account_status: (value) => /^(active|inactive|suspended|banned)$/.test(value),
-
-		profile: {
-			name: (value) => typeof value === 'string' && value.trim().length > 1,
-			age: (value) => Number.isInteger(value) && value >= 13,
-			email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-			phone: (value) => value === null || /^\+\d{1,3}\s?\d{4,14}$/.test(value),
-			address: {
-				street: (value) => typeof value === 'string' && value.trim().length > 2,
-				city: (value) => typeof value === 'string' && value.trim().length > 2,
-				postal_code: (value) => /^\d{5}-\d{3}$/.test(value),
-				country: (value) => typeof value === 'string' && value.length === 2,
-			},
-		},
-
-		configs: {
-			darkTheme: (value) => value === null || typeof value === 'boolean',
-			colorPreferences: {
-				header_and_footer: (value) =>
-					value === null ||
-					/^rgba\(\d{1,3}, \d{1,3}, \d{1,3}, (0|1|0?\.\d+)\)$/.test(value),
-				border_profile_photo: (value) =>
-					value === null ||
-					/^rgba\(\d{1,3}, \d{1,3}, \d{1,3}, (0|1|0?\.\d+)\)$/.test(value),
-			},
-			notifications: {
-				email: (value) => typeof value === 'boolean',
-				sms: (value) => typeof value === 'boolean',
-				push: (value) => typeof value === 'boolean',
-			},
-		},
-
-		social_links: {
-			github: (value) => value === null || /^https:\/\/github\.com\/.+$/.test(value),
-			linkedin: (value) =>
-				value === null || /^https:\/\/www\.linkedin\.com\/in\/.+$/.test(value),
-			twitter: (value) => value === null || /^https:\/\/twitter\.com\/.+$/.test(value),
-			meta_interprise: {
-				instagram: (value) =>
-					value === null || /^https:\/\/www\.instagram\.com\/.+$/.test(value),
-				facebook: (value) =>
-					value === null || /^https:\/\/www\.facebook\.com\/.+$/.test(value),
-			},
-		},
-
-		permissions: {
-			can_edit: (value) => typeof value === 'boolean',
-			can_delete: (value) => typeof value === 'boolean',
-			can_create_users: (value) => typeof value === 'boolean',
-			can_manage_roles: (value) => typeof value === 'boolean',
-		},
-
-		logs: {
-			last_login: (value) => typeof value === 'string' && !isNaN(Date.parse(value)),
-			last_action: (value) =>
-				value === null ||
-				["login", "logout", "update_profile", "delete_account"].includes(value),
-			ip_address: (value) =>
-				/^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/.test(value),
-		},
-	},
+	// estrutura do json com suas respectivas validações aqui (objeto anterior omitido apenas para facilitar leitura, coloque o schema como exemplificado anteriormente)           ...
 };
 
+
+validateJson(value, schema);
+
+}
 ```
