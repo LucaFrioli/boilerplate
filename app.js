@@ -28,8 +28,8 @@ class App {
 	}
 
 	routes() {
-		// mantenha as duas linhas caso for trbalhar com fullstack acoplado
-		this.app.use('/api', apiRoutes); // retire esta linha caso for trbalhar apenas com ssr
+		// mantenha as duas linhas caso for trabalhar com fullstack acoplado
+		this.app.use('/api', apiRoutes); // retire esta linha caso for trabalhar apenas com ssr
 		this.app.use('*', frontendRoutes); // retire esta linha caso for trabalhar apenas com API
 	}
 }
