@@ -14,41 +14,6 @@ export default class User extends Model {
 					defaultValue: Sequelize.UUIDV4(), // Garante que o UUID seja gerado automaticamente
 				},
 
-				// configuração dos campos requeridos
-				first_name: {
-					type: Sequelize.STRING(50),
-					validate: {
-						isAlphanumeric: {
-							msg: 'O Nome deve conter apenas caracteres Alphanuméricos',
-						},
-					}, // valida se é um registro alfanumérico,
-				},
-
-				last_name: {
-					type: Sequelize.STRING(50),
-					validate: {
-						isAlphanumeric: {
-							msg: 'O Sobrenome deve conter apenas caracteres Alphanuméricos',
-						},
-					},
-				},
-
-				phone_number: {
-					type: Sequelize.STRING(20),
-					validate: {
-						len: {
-							args: [[7, 20]],
-							msg: 'Números de telefone tem entre 7 a 20 caracteres',
-						},
-
-						is: {
-							// eslint-disable-next-line no-useless-escape
-							args: /^(?:\+?\d{1,3}[\s\.\-\(\)]?)?(\(?\d{2,4}\)?[\s\.\-\(\)]?)?(\d{4,5})[\s\.\-\(\)]?\d{4}$/,
-							msg: 'O telefone deve ser um núero válido',
-						},
-					},
-				},
-
 				email: {
 					type: Sequelize.STRING,
 					unique: {
@@ -57,17 +22,10 @@ export default class User extends Model {
 					validate: { isEmail: { msg: 'O Email é inválido' } },
 				},
 
-				birth_date: {
-					type: Sequelize.DATEONLY,
-					validate: { isDate: true },
-				}, // Tipo de dado apenas de data (sem hora)
-
 				is_active: {
 					type: Sequelize.BOOLEAN,
 					validate: { isIn: [[true, false]] },
 				},
-
-				ip_address: { type: Sequelize.INET, validate: { isIP: true } }, // Tipo de dado para armazenar um endereço IP
 
 				additional_info: {
 					type: Sequelize.JSONB,
