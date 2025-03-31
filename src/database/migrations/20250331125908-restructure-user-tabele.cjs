@@ -28,6 +28,17 @@ module.exports = {
 			await queryInterface.removeColumn('users', 'ip_address', {
 				transaction,
 			});
+
+			await queryInterface.addColumn(
+				'users',
+				'role',
+				{
+					type: Sequelize.ENUM('admin', 'user', 'employee'),
+					defaultValue: 'user',
+					allowNull: false,
+				},
+				{ transaction },
+			);
 			transaction.commit();
 		} catch (e) {
 			transaction.rollback();
